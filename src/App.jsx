@@ -32,7 +32,13 @@ const RandomTeamPicker = () => {
 
   const addMember = () => {
     if (inputValue.trim()) {
-      setMembers((prev) => [...prev, { name: inputValue.trim(), isStar: false }]);
+      const newMembers = inputValue
+        .split(",")
+        .map((name) => name.trim())
+        .filter((name) => name.length > 0)
+        .map((name) => ({ name, isStar: false }));
+
+      setMembers((prev) => [...prev, ...newMembers]);
       setInputValue("");
     }
   };
@@ -87,10 +93,9 @@ const RandomTeamPicker = () => {
     const rounds = roundRobin(
       teams.length,
       teams.map((t, idx) => `Team ${idx + 1}`)
-    );
-    console.log("rounds", rounds);
-    const matchDays = rounds.map((r) => r.map((m) => ({ home: m[0], away: m[1] })));    
-    setMatches(matchDays);
+    );    
+    const matchDays = rounds.map((r) => r.map((m) => ({ home: m[0], away: m[1] })));
+    setMatches(matchDays.reverse());
     saveToLocalStorage(members, teams, matchDays);
   };
 
@@ -176,7 +181,7 @@ const RandomTeamPicker = () => {
                 </li>
               ))}
             </ul>
-            
+
             <h3 className="text-xl font-semibold mt-3 text-gray-700 text-center">Lịch thi đấu</h3>
             <ul className="overflow-y-auto max-h-90">
               {matches.map((matchDay, index) => (
